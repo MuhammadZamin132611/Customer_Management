@@ -50,7 +50,7 @@ namespace LearnAPI.Controllers
                 };
                 var token = tokenHandler.CreateToken(tokendesc);
                 var finaltoken = tokenHandler.WriteToken(token);
-                return Ok(new TokenResponse() { Token = finaltoken, RefreshToken = await this.refresh.GenerateToken(userCred.username)});
+                return Ok(new TokenResponse() { Token = finaltoken, RefreshToken = await this.refresh.GenerateToken(userCred.username), userRole = user.Role});
             }
             else
             {

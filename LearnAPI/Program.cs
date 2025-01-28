@@ -22,6 +22,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ICustomerService, CustomerService>();
 builder.Services.AddTransient<IRefreshHandler, RefreshHandler>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IUserRoleService, UserRoleService>();
 builder.Services.AddDbContext<LearndataContext>(o 
     => o.UseSqlServer(builder.Configuration.GetConnectionString("apicon")));
 
@@ -52,7 +54,7 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddCors(option
     => option.AddPolicy("corspolicy", build =>
     {
-        build.WithOrigins("*")
+        build.WithOrigins("http://localhost:4200/", "https://localhost:4200/","*")
         .AllowAnyMethod().AllowAnyHeader();
     }));
 builder.Services.AddCors(option
@@ -70,7 +72,7 @@ builder.Services.AddCors(option
 
 builder.Services.AddRateLimiter(_ => _.AddFixedWindowLimiter(policyName:"fixedwindow", options =>
 {
-    options.Window = TimeSpan.FromSeconds(10);
+    options.Window = TimeSpan.FromMinutes(60);
     options.PermitLimit = 1;
     options.QueueLimit = 0;
     options.QueueProcessingOrder = System.Threading.RateLimiting.QueueProcessingOrder.OldestFirst;
@@ -90,13 +92,19 @@ builder.Services.Configure<JwtSettings>(_jwtsetting);
 
 var app = builder.Build();
 
+//app.MapGet("/minimalapi", ()=>"Mohd Zmain");
+//app.MapGet("/getchannel", (string channelname) => "Welcome to " + channelname);
+
+
 app.UseRateLimiter();
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
+//if (app.Environment.IsDevelopment())
+//{
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+//}
+
+app.UseStaticFiles();
 
 app.UseCors();
 
